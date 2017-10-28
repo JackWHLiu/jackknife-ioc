@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017. The JackKnife Open Source Project
+ * Copyright (C) 2017 The JackKnife Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,9 @@
  * limitations under the License.
  */
 
-apply plugin: 'com.android.library'
-apply plugin: 'com.github.dcendents.android-maven'
-group='com.github.JackWHLiu'
+package com.lwh.jackknife.ioc;
 
-android {
-    compileSdkVersion 23
-    buildToolsVersion "26.0.2"
-    defaultConfig {
-        minSdkVersion 11
-        targetSdkVersion 23
-        versionCode 51
-        versionName "1.5.4"
-    }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+public interface SupportDialog extends SupportV {
+
+    SupportActivity getDialogActivity();
 }
