@@ -44,7 +44,7 @@ dependencies {
 #### 3、自动注册事件（Inject Events）
 >  ）创建一个自定义的事件注解，在这个注解上配置@EventBase，并使用在你要实际回调的方法上，<b>注意保持参数列表跟原接口的某个回调方法的参数列表保持一致</b>。在jackknife-annotations-ioc中也提供了常用的事件的注解，比如@OnClick。
 
-二、博客（绿色通道）
+三、博客（绿色通道）
 --------------------------------
 简书 : https://www.jianshu.com/u/8f43e6fd56db, https://www.jianshu.com/u/f408bdadacce
 CSDN : http://blog.csdn.net/yiranaini_/
