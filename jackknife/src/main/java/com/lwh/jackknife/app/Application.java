@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017. The JackKnife Open Source Project
+ * Copyright (C) 2017 The JackKnife Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.lwh.jackknife.app;
 
 import android.app.ActivityGroup;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import com.lwh.jackknife.ioc.SupportActivity;
 
@@ -33,38 +32,23 @@ public class Application extends android.app.Application {
     /**
      * Only a mirror used to record the activity created.
      */
-    private Stack<WeakReference<SupportActivity>> mActivityStacks;
+    protected Stack<WeakReference<? extends SupportActivity>> mActivityStacks;
 
     /**
      * There is only one instance of the program.
      */
     private static Application sApp;
 
-    /**
-     * It is attached to the application context and is easy to access anywhere in the program.
-     */
-    private SQLiteOpenHelper mSQLiteOpenHelper;
-
     @Override
     public void onCreate() {
         super.onCreate();
-        sApp = this;
         mActivityStacks = new Stack<>();
+        sApp = this;
     }
 
     /**
-     * After attachment, you can get it in {@link #getSQLiteOpenHelper()}.
-     *
-     * @param helper A helper class to manage database creation and version management.
+     * Get a unique instance.
      */
-    public void attach(SQLiteOpenHelper helper){
-        this.mSQLiteOpenHelper = helper;
-    }
-
-    public SQLiteOpenHelper getSQLiteOpenHelper(){
-        return mSQLiteOpenHelper;
-    }
-
     public static Application getInstance(){
         return sApp;
     }
@@ -80,28 +64,54 @@ public class Application extends android.app.Application {
      * windows (via a theme with {@link android.R.attr#windowIsFloating} set)
      * or embedded inside of another activity (using {@link ActivityGroup}).
      */
-    /* package */ void pushTask(SupportActivity activity){
+    public void pushTask(SupportActivity activity) {
         mActivityStacks.add(new WeakReference<>(activity));
     }
 
     /**
      * Destroy and remove activity from the top of the task stack.
      */
-    /* package */ void popTask(){
-        WeakReference<SupportActivity> ref = mActivityStacks.pop();
-        SupportActivity activity = ref.get();
-        activity.finish();
-        mActivityStacks.remove(activity);
+    public void popTask() {
+        WeakReference<? extends SupportActivity> ref = mActivityStacks.peek();
+        if (ref != null) {
+            mActivityStacks.pop();
+        }
     }
 
     /**
      * Destroy and remove all activities in the task stack.
      */
-    protected void removeTasks(){
-        for (WeakReference<SupportActivity> ref:mActivityStacks){
-            SupportActivity activity = ref.get();
-            activity.finish();
+    public void close() {
+        for (WeakReference<? extends SupportActivity> ref:mActivityStacks) {
+            if (ref != null) {
+                SupportActivity activity = ref.get();
+                if (activity != null) {
+                    activity.finish();
+                }
+            }
         }
-        mActivityStacks.removeAllElements();
+    }
+
+    public void closeRetainBottom() {
+        int size = mActivityStacks.size();
+        for (int i=size-1;i > 0;i--) {
+            WeakReference<? extends SupportActivity> ref = mActivityStacks.get(i);
+            if (ref != null) {
+                SupportActivity activity = ref.get();
+                if (activity != null) {
+                    activity.finish();
+                }
+            }
+        }
+    }
+
+    /**
+     * Destroy all of the activities, and then kill processes.
+     *
+     * @see Application#close()
+     */
+    public void forceClose() {
+        close();
+        android.os.Process.killProcess(android.os.Process.myPid());
     }
 }

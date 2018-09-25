@@ -17,16 +17,21 @@
 package com.lwh.jackknife.app;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.View;
 
 import com.lwh.jackknife.ioc.SupportActivity;
 import com.lwh.jackknife.ioc.SupportDialog;
 import com.lwh.jackknife.ioc.ViewInjector;
 import com.lwh.jackknife.ioc.exception.LackInterfaceException;
 
-import java.lang.reflect.InvocationTargetException;
+/**
+ * Automatically inject a layout, bind views, and register events for dialogs.
+ */
 
-public class Dialog extends android.app.Dialog implements SupportDialog {
+public abstract class Dialog extends android.app.Dialog implements SupportDialog,
+        DialogInterface.OnShowListener, DialogInterface.OnDismissListener {
 
     public Dialog(Context context) {
         super(context);
@@ -43,19 +48,11 @@ public class Dialog extends android.app.Dialog implements SupportDialog {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            ViewInjector.create().inject(this);
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        setContentView(onCreateView());
+        ViewInjector.inject(this);
+        initData(this);
+        setOnShowListener(this);
+        setOnDismissListener(this);
     }
 
     @Override
@@ -63,6 +60,28 @@ public class Dialog extends android.app.Dialog implements SupportDialog {
         if (getOwnerActivity() instanceof SupportActivity) {
             return (SupportActivity) getOwnerActivity();
         }
-        throw new LackInterfaceException("activity缺少SupportActivity接口");
+        throw new LackInterfaceException("The activity lacks the SupportActivity interface.");
     }
+
+    protected abstract void initData(Dialog dialog);
+
+    @Override
+    public View findViewById(int id) {
+        return super.findViewById(id);
+    }
+
+    /**
+     * Seize activity's layout.
+     */
+    protected abstract View onCreateView();
+
+    /**
+     * Called when the dialog is displayed.
+     */
+    public abstract void onShow(DialogInterface dialog);
+
+    /**
+     * Called when the dialog is hidden.
+     */
+    public abstract void onDismiss(DialogInterface dialog);
 }

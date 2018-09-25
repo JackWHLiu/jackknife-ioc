@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017. The JackKnife Open Source Project
+ * Copyright (C) 2017 The JackKnife Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,54 +21,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.lwh.jackknife.ioc.bind.BindLayout;
 import com.lwh.jackknife.ioc.SupportActivity;
 import com.lwh.jackknife.ioc.SupportFragment;
 import com.lwh.jackknife.ioc.ViewInjector;
 import com.lwh.jackknife.ioc.exception.LackInterfaceException;
-
-import java.lang.reflect.InvocationTargetException;
+import com.lwh.jackknife.ioc.inject.FragmentHandler;
 
 /**
  * Automatically inject a layout, bind views, and register events for fragments.
  */
-public abstract class Fragment extends android.app.Fragment implements SupportFragment{
+public abstract class Fragment extends android.app.Fragment implements SupportFragment {
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		try {
-			return ViewInjector.create().injectLayout(this);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		}
-		return super.onCreateView(inflater, container, savedInstanceState);
+		FragmentHandler handler = new FragmentHandler();
+		return handler.inflateLayout(new BindLayout(this));
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		try {
-			ViewInjector.create().inject(this);
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (NoSuchFieldException e) {
-			e.printStackTrace();
-		}
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		ViewInjector.inject(this);
 	}
 
 	@Override
@@ -76,6 +49,6 @@ public abstract class Fragment extends android.app.Fragment implements SupportFr
 		if (getActivity() instanceof SupportActivity) {
 			return (SupportActivity) getActivity();
 		}
-		throw new LackInterfaceException("activity缺少SupportActivity接口");
+		throw new LackInterfaceException("The activity lacks the SupportActivity interface.");
 	}
 }

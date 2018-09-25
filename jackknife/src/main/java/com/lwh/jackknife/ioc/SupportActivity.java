@@ -16,13 +16,20 @@
 
 package com.lwh.jackknife.ioc;
 
-import android.view.View;
+import android.app.Activity;
 
+/**
+ * Let an activity implements it, for example, {@link android.app.Activity} and so on.
+ */
 public interface SupportActivity extends SupportV {
 
+    /**
+     * {@link Activity#getPackageName()}
+     */
     String getPackageName();
 
-    View findViewById(int id);
-
+    /**
+     * {@link Activity#finish()}
+     */
     void finish();
 }

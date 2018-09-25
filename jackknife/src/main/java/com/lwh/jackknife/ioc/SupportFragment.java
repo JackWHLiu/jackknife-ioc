@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017. The JackKnife Open Source Project
+ * Copyright (C) 2017 The JackKnife Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,15 @@
 
 package com.lwh.jackknife.ioc;
 
+import android.app.Fragment;
+
+/**
+ * Let a fragment implements it, for example, {@link android.app.Fragment} and so on.
+ */
 public interface SupportFragment extends SupportV {
 
+    /**
+     * @see Fragment#getActivity()
+     */
     SupportActivity getFragmentActivity();
 }

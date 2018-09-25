@@ -16,7 +16,15 @@
 
 package com.lwh.jackknife.ioc;
 
+import android.app.Dialog;
+
+/**
+ * Let a dialog implements it, for example, {@link android.app.Dialog} and so on.
+ */
 public interface SupportDialog extends SupportV {
 
+    /**
+     * @see Dialog#getOwnerActivity()
+     */
     SupportActivity getDialogActivity();
 }
